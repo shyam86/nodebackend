@@ -2,33 +2,14 @@ const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const mysql = require('mysql')
+//body parser
+const bodyParser =require('body-parser') 
+app.use(express.static('./public'))
+app.use(morgan('short'))
 
-app.use(morgan('combined'))
 
-
-app.get("/users/:id", (req, res) => {
-    console.log("********************Feteching user with id:"+ req.params.id)  
-    
-    const connection  = mysql.createConnection({
-        
-    })
-
-    const userId = req.params.id
-    const queryString = "SELECT * FROM users WHERE user_id =?"
-    
-    connection.query(queryString, [userId], (err, rows, fields) => {
-        if (err) {
-         console.log("SQL ERR" +err)
-         res.sendStatus(500)
-         res.end()
-         return    
-        }
-        res.json(rows)
-        console.log("Feteched users successfully")
-    })
-    
-    //res.end()
-    })
+//helps to process the request from html form easier
+app.use(bodyParser.urlencoded({extended:false}))
 
     
 app.get("/", (req, res) => {
@@ -36,17 +17,14 @@ app.get("/", (req, res) => {
     res.send("Hello world!")
 })
 
-app.get("/users", (req, res) => {
-    const user1= {firstName:  "Shyam", lastName: "Kumar"}
-    const user2= {firstName:  "Kar", lastName: "Thik"}
-    
-    res.json([user1,user2])
-  //  res.send("Users: Shyam!")
-})
+//router
+const router = require('./routes/user.js')
+app.use(router)
 
 
+//to listen on specific port
+const port = process.env.PORT || 3002;
 
-
-app.listen(3002,() => {
-console.log('server is up and listening on 3002...')
+app.listen(port,() => {
+console.log('server is up and listening on ...'+port)
 })
